@@ -37,62 +37,6 @@ def gen_grid_graph(dim, weight_range):
             G[u][v]['weight'] = random.randint(*weight_range)
     return G
 
-def gen_grid_graph(dim, weight_range):
-    G = nx.watts_strogatz_graph(dim[0] * dim[1], 4, 0.2)
-    G = G.to_directed()
-    mn = min(G.nodes)
-
-    shortest_path_lengths = nx.shortest_path_length(G, source=mn)
-    max_length = -1
-    node_with_max_length = None
-    for node, length in shortest_path_lengths.items():
-        if length > max_length and length != float("inf"):
-            max_length = length
-            node_with_max_length = node
-
-
-    relabel_map = {u: str(u) for u in G.nodes}
-    G = nx.relabel_nodes(G, relabel_map)
-    G.add_node('s')
-    G.add_node('t')
-    G.add_edge('s', str(mn))
-    G.add_edge(str(node_with_max_length), 't')
-    
-    for u, v in G.edges:
-        if u == 's' or v == 't':
-            G[u][v]['weight'] = 0
-        else:
-            G[u][v]['weight'] = random.randint(*weight_range)
-    return G
-
-def gen_grid_graph(dim, weight_range):
-    G = nx.grid_2d_graph(*dim).to_directed()
-    for u, v in list(G.edges):
-        if u[0] > v[0] or u[1] > v[1]:
-            G.remove_edge(u, v)
-    
-    G.add_node('s')
-    G.add_node('t')
-    for x in G.nodes:
-        if x != 's' and x != 't':
-            if x[1] == 0:
-                G.add_edge('s', x)
-            if x[1] == dim[1] - 1:
-                G.add_edge(x, 't')
-    
-    relabel_map = {}
-    for x in G.nodes:
-        if x != 's' and x != 't':
-            relabel_map[x] = str(x[0] * dim[1] + x[1])
-    G = nx.relabel_nodes(G, relabel_map)
-    
-    for u, v in G.edges:
-        if u == 's' or v == 't':
-            G[u][v]['weight'] = 0
-        else:
-            G[u][v]['weight'] = random.randint(*weight_range)
-    return G
-
 def gen_int_weights(G, weight_range):
     int_weights = {}
     for u, v in G.edges:
